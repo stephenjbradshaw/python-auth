@@ -1,4 +1,4 @@
-from connection import con
+from db.connection import con
 import sqlite3
 from typing import Optional
 
@@ -43,7 +43,3 @@ def remove_email_verification_token(email: str):
     cur.execute(
         "UPDATE user SET email_verification_token=NULL WHERE email=?", (email,))
     con.commit()
-
-
-if __name__ == '__main__':
-    print(get_user_by_email('hello@stephenbradshaw.dev'))

@@ -9,6 +9,14 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(bytes(message, 'utf-8'))
 
+    # Basic GET endpoint to check API is functioning
+    def do_GET(self):
+        if self.path == '/':
+            self.response(200, 'OK')
+        else:
+            self.response(404, 'Not Found')
+
+    # POST endpoints
     def do_POST(self):
         try:
             # Only accept JSON payloads

@@ -16,6 +16,7 @@ def register(handler, body):
         password = json_body['password']
     except KeyError:
         handler.response(400, 'Missing email or password')
+        return
 
     if not utils.valid_email(email):
         handler.response(400, 'Invalid email')
@@ -32,7 +33,8 @@ def register(handler, body):
     newUser = models.User(email, salt, hashed_password, verification_token)
     models.create_user(newUser)
 
-    # Here we would send an email to the user with a link containing the token
+    # Would send an email to the user here with a link containing the token
+    # This would open a page on the frontend that would call the verify-email endpoint
 
     handler.response(200, "User created")
 
@@ -60,7 +62,7 @@ def verify_email(handler, body):
     # Remove the token from the database
     models.remove_email_verification_token(email)
 
-    handler.response(200, "User updated")
+    handler.response(200, "User verified")
 
 
 def login(handler, body):
@@ -83,6 +85,7 @@ def login(handler, body):
         password, user.salt, user.hashed_password)
 
     if valid_login:
-        handler.response(200, "Authorized")
+        handler.response(200, "Login successful")
+        # Would issue JWT here or similar
     else:
         handler.response(401, "Unauthorized")
