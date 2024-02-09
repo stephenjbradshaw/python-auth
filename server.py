@@ -1,9 +1,9 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import controllers
+import traceback
 
 
 class Handler(BaseHTTPRequestHandler):
-
     def response(self, status_code, message):
         self.send_response(status_code)
         self.end_headers()
@@ -11,9 +11,8 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         try:
-            content_type = self.headers['Content-Type']
-
             # Only accept JSON payloads
+            content_type = self.headers['Content-Type']
             if content_type != 'application/json':
                 self.response(400, "Only JSON payloads allowed")
                 return
@@ -21,6 +20,11 @@ class Handler(BaseHTTPRequestHandler):
             # Read the body of the request
             content_length = int(self.headers['Content-Length'])
             body = self.rfile.read(content_length)
+
+            # Ensure the body is not empty
+            if len(body) == 0:
+                self.response(400, 'Empty request body')
+                return
 
             # Routing
             if self.path == '/register':
@@ -31,9 +35,10 @@ class Handler(BaseHTTPRequestHandler):
                 controllers.login(self, body)
             else:
                 self.response(404, 'Not Found')
-        except Exception as e:
+
+        except Exception:
             # Catch any exceptions not handled in the controllers
-            print(e)
+            print(traceback.format_exc())
             self.response(500, 'Internal Server Error')
 
 
@@ -41,4 +46,8 @@ if __name__ == '__main__':
     PORT = 8000
     server = HTTPServer(('0.0.0.0', PORT), Handler)
     print(f'server running on port {PORT}')
-    server.serve_forever()
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        server.server_close()
+        print('server stopped')

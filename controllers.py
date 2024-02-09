@@ -1,4 +1,5 @@
 import models
+from models import User
 from utils import valid_email, valid_password, hash_password, get_email_verification_token
 import json
 
@@ -29,7 +30,8 @@ def register(handler, body):
     verification_token = get_email_verification_token(email)
 
     # Save user to database
-    models.create_user(email, salt, hashed_password, verification_token)
+    newUser = User(email, salt, hashed_password, verification_token)
+    models.create_user(newUser)
 
     handler.response(200, "User created")
 
@@ -48,9 +50,9 @@ def verify_email(handler, body):
     except KeyError:
         handler.response(400, 'Missing email or token')
 
-    user = models.get_user(email)
+    user = models.get_user_by_email(email)
 
-    if user is None or user[3] != token:
+    if user is None or user.email_verification_token != token:
         handler.response(401, 'Unauthorized')
         return
 
