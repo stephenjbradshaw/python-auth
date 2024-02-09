@@ -3,7 +3,7 @@ import utils
 import json
 
 
-def register(handler, body):
+def register(handler, body: str) -> None:
     '''
     Create a new user in the database,
     handling validation and hashing of the password.
@@ -39,7 +39,7 @@ def register(handler, body):
     handler.response(200, "User created")
 
 
-def verify_email(handler, body):
+def verify_email(handler, body: str) -> None:
     '''
     If the supplied email and token match those stored in
     the database, mark the user as verified by removing the token
@@ -65,7 +65,7 @@ def verify_email(handler, body):
     handler.response(200, "User verified")
 
 
-def login(handler, body):
+def login(handler, body: str) -> None:
     '''
     If the supplied email and password match that in the database,
     authorize the login

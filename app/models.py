@@ -13,7 +13,12 @@ class User:
         self.email_verification_token = email_verification_token
 
     def __str__(self):
-        return f"User(email: {self.email}, salt: {self.salt}, hashed_password: {self.hashed_password}, email_verification_token: {self.email_verification_token})"
+        return (
+            f"User(email: {self.email}, "
+            f"salt: {self.salt}, "
+            f"hashed_password: {self.hashed_password}, "
+            f"email_verification_token: {self.email_verification_token})"
+        )
 
 
 def get_user_by_email(email: str) -> Optional[User]:
@@ -25,7 +30,7 @@ def get_user_by_email(email: str) -> Optional[User]:
         return None
 
 
-def create_user(user: User) -> tuple:
+def create_user(user: User) -> None:
     data = (user.email, user.salt, user.hashed_password,
             user.email_verification_token)
     try:
@@ -36,7 +41,7 @@ def create_user(user: User) -> tuple:
     con.commit()
 
 
-def remove_email_verification_token(email: str):
+def remove_email_verification_token(email: str) -> None:
     '''
     Remove the token, marking the user as verified
     '''
