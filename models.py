@@ -46,4 +46,4 @@ def remove_email_verification_token(email: str):
 
 
 if __name__ == '__main__':
-    print(get_user_by_email('test@example.com'))
+    print(get_user_by_email('hello@stephenbradshaw.dev'))

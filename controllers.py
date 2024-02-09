@@ -1,6 +1,5 @@
 import models
-from models import User
-from utils import valid_email, valid_password, hash_password, get_email_verification_token
+import utils
 import json
 
 
@@ -18,20 +17,22 @@ def register(handler, body):
     except KeyError:
         handler.response(400, 'Missing email or password')
 
-    if not valid_email(email):
+    if not utils.valid_email(email):
         handler.response(400, 'Invalid email')
         return
 
-    if not valid_password(password):
+    if not utils.valid_password(password):
         handler.response(400, 'Invalid password')
         return
 
-    salt, hashed_password = hash_password(password)
-    verification_token = get_email_verification_token(email)
+    salt, hashed_password = utils.hash_password(password)
+    verification_token = utils.get_email_verification_token(email)
 
     # Save user to database
-    newUser = User(email, salt, hashed_password, verification_token)
+    newUser = models.User(email, salt, hashed_password, verification_token)
     models.create_user(newUser)
+
+    # Here we would send an email to the user with a link containing the token
 
     handler.response(200, "User created")
 
@@ -63,4 +64,25 @@ def verify_email(handler, body):
 
 
 def login(handler, body):
-    None
+    '''
+    If the supplied email and password match that in the database,
+    authorize the login
+    '''
+    # Parse request body
+    json_body = json.loads(body)
+
+    try:
+        email = json_body['email']
+        password = json_body['password']
+    except KeyError:
+        handler.response(400, 'Missing email or password')
+
+    user = models.get_user_by_email(email)
+
+    valid_login = user and user.email_verification_token == None and utils.validate_password(
+        password, user.salt, user.hashed_password)
+
+    if valid_login:
+        handler.response(200, "Authorized")
+    else:
+        handler.response(401, "Unauthorized")

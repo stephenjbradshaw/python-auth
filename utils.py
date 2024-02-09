@@ -25,6 +25,14 @@ def hash_password(password: str) -> tuple[str, str]:
 
     return salt.hex(), derived_key.hex()
 
+def validate_password(password: str, salt: str, hashed_password: str) -> bool:
+    '''
+    Validate the password against the stored hash
+    '''
+    derived_key = hashlib.pbkdf2_hmac(
+        'sha256', password.encode("utf-8"), bytes.fromhex(salt), 100000)
+    return derived_key.hex() == hashed_password
+
 
 def get_email_verification_token(email: str) -> str:
     '''
